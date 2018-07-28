@@ -248,7 +248,7 @@ class Main(QtCore.QObject):
       self.settings.setValue("backgroundDir", os.path.dirname(fileName))
       self.window.label_background.setText(fileName)
     self.drawPreview()
-
+    
   def createAudioVisualisation(self):
     ffmpeg_cmd = self.settings.value("ffmpeg_cmd", expanduser("~"))
 

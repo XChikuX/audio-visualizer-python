@@ -4,11 +4,13 @@ from PyQt4.QtGui import QPainter, QColor
 from os.path import expanduser
 import subprocess as sp
 import numpy
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance, ImageFilter
 from PIL.ImageQt import ImageQt
 import tempfile
 from shutil import rmtree
 import atexit
+import math
+import random
 
 class Core():
 
@@ -89,19 +91,22 @@ class Core():
 
   def drawBars(self, spectrum, image, color):
 
-    imTop = Image.new("RGBA", (1280, 360))
-    draw = ImageDraw.Draw(imTop)
+    imBottom = Image.new("RGBA", (1280, 360)) #1080, 540
+    draw = ImageDraw.Draw(imBottom)
     r, g, b = color
     color2 = (r, g, b, 50)
+    i = 0
     for j in range(0, 63):
-      draw.rectangle((10 + j * 20, 325, 10 + j * 20 + 20, 325 - spectrum[j * 4] * 1 - 10), fill=color2)
-      draw.rectangle((15 + j * 20, 320, 15 + j * 20 + 10, 320 - spectrum[j * 4] * 1), fill=color)
+      draw.line((640+100*math.sin(math.radians(i)), (100*math.cos(math.radians(i))), (640+(100+spectrum[j * 4])*math.sin(math.radians(i))), (100+spectrum[j * 4])*math.cos(math.radians(i))), fill=color2, width=10)
+      draw.line((640+100*math.sin(math.radians(i)), (100*math.cos(math.radians(i))), (640+(65+spectrum[j * 4])*math.sin(math.radians(i))), (65+spectrum[j * 4])*math.cos(math.radians(i))), fill=color, width=10)
+      i=i+6;
 
 
-    imBottom = imTop.transpose(Image.FLIP_TOP_BOTTOM)
+    imTop = imBottom.transpose(Image.FLIP_TOP_BOTTOM)
+
     
     im = Image.new("RGB", (1280, 720), "black")
-    im.paste(image, (0, 0))
+    im.paste(image.filter(ImageFilter.BLUR), (0, 0))
     im.paste(imTop, (0, 0), mask=imTop)
     im.paste(imBottom, (0, 360), mask=imBottom)
 
